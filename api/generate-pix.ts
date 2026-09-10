@@ -108,11 +108,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       pixData = await sigilopayRes.json();
       transactionId = pixData.transactionId || identifier;
+
+      const qrImageUrl =
+        pixData.pix?.base64 && pixData.pix.base64.length > 50
+          ? `data:image/png;base64,${pixData.pix.base64}`
+          : `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
+              pixData.pix?.code || ''
+            )}`;
+
+      pixData.pix = {
+        ...pixData.pix,
+        image: qrImageUrl,
+      };
     } else {
       // Modo de Demonstração / Aguardando Chaves
       // Gera payload Pix dinâmico formatado para permitir teste completo do fluxo de ponta a ponta
       const simulatedPixCode = `00020126580014br.gov.bcb.pix0136${Math.random().toString(36).substring(2, 18)}520400005303986540519.905802BR5917ADCC VIP 20266009SAO PAULO62070503***6304ABCD`;
-      const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
+      const simulatedQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
         simulatedPixCode
       )}`;
 
@@ -122,7 +134,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         message: 'Modo teste ativo (adicione as chaves da SigiloPay no arquivo .env para processar Pix real).',
         pix: {
           code: simulatedPixCode,
-          image: qrImageUrl,
+          image: simulatedQrUrl,
         },
       };
     }
@@ -156,17 +168,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const { data, error: dbError } = await supabase
           .from('transactions')
           .insert({
+            id: transactionId,
             profile_id: profileId || null,
             amount: finalCredit,
             status: 'PENDING',
             sigilopay_id: transactionId,
             pix_code: pixData.pix?.code,
             pix_image: pixData.pix?.image,
+            client_name: client?.name,
+            client_phone: sanitizedPhone,
+            client_document: sanitizedDoc,
           })
           .select()
           .single();
 
-        if (!dbError && data) {
+        if (dbError) {
+          console.error('Erro detalhado ao inserir no Supabase:', dbError);
+        } else if (data) {
           dbData = data;
         }
       } catch (err) {
