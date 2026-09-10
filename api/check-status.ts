@@ -28,10 +28,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 1. Verifica no cache em memória
   if (memoryStore.has(transactionId)) {
     const tx = memoryStore.get(transactionId);
+    const isPaid = tx.status === 'PAID';
     return res.status(200).json({
       status: tx.status,
       transaction: tx,
-      telegramLink: process.env.TELEGRAM_GROUP_LINK || 'https://t.me/+ADCC2026_VIP_OFICIAL'
+      telegramLink: isPaid ? (process.env.TELEGRAM_GROUP_LINK || 'https://t.me/+ADCC2026_VIP_OFICIAL') : null
     });
   }
 
@@ -54,10 +55,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .single();
 
       if (tx) {
+        const isPaid = tx.status === 'PAID';
         return res.status(200).json({
           status: tx.status,
           transaction: tx,
-          telegramLink: process.env.TELEGRAM_GROUP_LINK || 'https://t.me/+ADCC2026_VIP_OFICIAL'
+          telegramLink: isPaid ? (process.env.TELEGRAM_GROUP_LINK || 'https://t.me/+ADCC2026_VIP_OFICIAL') : null
         });
       }
     } catch (e) {
@@ -67,6 +69,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   return res.status(200).json({
     status: 'PENDING',
-    telegramLink: process.env.TELEGRAM_GROUP_LINK || 'https://t.me/+ADCC2026_VIP_OFICIAL'
+    telegramLink: null
   });
 }

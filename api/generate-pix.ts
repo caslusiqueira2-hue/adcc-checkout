@@ -181,7 +181,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       transaction: dbData,
       pix: pixData.pix,
       isTestMode: !isSigiloConfigured,
-      telegramLink: process.env.TELEGRAM_GROUP_LINK || 'https://t.me/+ADCC2026_VIP_OFICIAL',
     });
   } catch (error: any) {
     return res.status(400).json({ error: error.message || 'Erro interno ao processar Pix.' });

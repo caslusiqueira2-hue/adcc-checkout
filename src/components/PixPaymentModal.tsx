@@ -26,8 +26,30 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
   );
   const [timeRemaining, setTimeRemaining] = useState<number>(15 * 60); // 15 minutos
   const [isSimulating, setIsSimulating] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
+  const [checkFeedback, setCheckFeedback] = useState<string | null>(null);
 
   const txId = pixData.transaction?.id || pixData.transaction?.sigilopay_id || '';
+
+  const handleManualCheck = async () => {
+    setIsChecking(true);
+    setCheckFeedback(null);
+    try {
+      const res = await checkPaymentStatus(txId);
+      if (res.status === 'PAID') {
+        setStatus('PAID');
+        if (res.telegramLink) {
+          setTelegramUrl(res.telegramLink);
+        }
+      } else {
+        setCheckFeedback('Pagamento ainda não localizado pelo banco. Se você acabou de pagar no aplicativo, aguarde cerca de 10 a 20 segundos e verifique novamente.');
+      }
+    } catch (e) {
+      setCheckFeedback('Aguardando confirmação bancária. O sistema continua monitorando automaticamente a cada 2 segundos.');
+    } finally {
+      setIsChecking(false);
+    }
+  };
 
   // Timer de 15 minutos para expiração do Pix
   useEffect(() => {
@@ -222,15 +244,33 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
               <span>Aguardando confirmação bancária em tempo real...</span>
             </div>
 
-            {/* Botão de Verificação Manual (Garante liberação imediata mesmo sem banco Supabase) */}
-            <button
-              type="button"
-              onClick={() => setStatus('PAID')}
-              className="mt-3 w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              <Check className="w-4 h-4 text-emerald-400" />
-              <span>Já fiz o Pix no meu banco (Liberar Link do Telegram)</span>
-            </button>
+            {/* Verificação Segura: Checa diretamente no servidor se o Pix foi pago */}
+            <div className="w-full mt-3">
+              <button
+                type="button"
+                onClick={handleManualCheck}
+                disabled={isChecking}
+                className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+              >
+                {isChecking ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+                    <span>Verificando com o banco...</span>
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-4 h-4 text-emerald-400" />
+                    <span>Já fiz o Pix (Verificar Pagamento)</span>
+                  </>
+                )}
+              </button>
+
+              {checkFeedback && (
+                <p className="mt-2 text-[11px] text-amber-300/90 text-center bg-amber-950/40 p-2 rounded-lg border border-amber-500/20">
+                  {checkFeedback}
+                </p>
+              )}
+            </div>
 
             {/* Botão de Ajuda / Teste caso esteja em modo dev ou sem as chaves da SigiloPay */}
             {pixData.isTestMode && (
