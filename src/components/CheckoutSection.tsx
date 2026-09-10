@@ -5,16 +5,30 @@ import { trackInitiateCheckout } from '../lib/metaPixel';
 import type { PixResponse } from '../types';
 
 interface CheckoutSectionProps {
-  onPixGenerated: (data: PixResponse, clientName: string) => void;
+  onPixGenerated: (data: PixResponse, clientName: string, amount: number) => void;
+  amount?: number;
+  originalPrice?: string;
+  badgeDiscount?: string;
+  ctaText?: string;
+  isDownsell?: boolean;
 }
 
-export const CheckoutSection: React.FC<CheckoutSectionProps> = ({ onPixGenerated }) => {
+export const CheckoutSection: React.FC<CheckoutSectionProps> = ({
+  onPixGenerated,
+  amount = 19.90,
+  originalPrice = 'De R$ 97,00',
+  badgeDiscount = '80% DE DESCONTO',
+  ctaText,
+  isDownsell = false,
+}) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [document, setDocument] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const formattedAmount = `R$ ${amount.toFixed(2).replace('.', ',')}`;
 
   // Máscara de CPF automática (000.000.000-00)
   const formatCPF = (value: string) => {
@@ -72,7 +86,7 @@ export const CheckoutSection: React.FC<CheckoutSectionProps> = ({ onPixGenerated
 
     try {
       const response = await generatePix({
-        amount: 19.90,
+        amount: amount,
         client: {
           name: name.trim(),
           email: email.trim().toLowerCase(),
@@ -81,8 +95,8 @@ export const CheckoutSection: React.FC<CheckoutSectionProps> = ({ onPixGenerated
         },
       });
 
-      trackInitiateCheckout(19.90, 'BRL');
-      onPixGenerated(response, name.trim());
+      trackInitiateCheckout(amount, 'BRL');
+      onPixGenerated(response, name.trim(), amount);
     } catch (err: any) {
       setError(err.message || 'Falha ao processar solicitação de Pix. Verifique os dados e tente novamente.');
     } finally {
@@ -91,22 +105,22 @@ export const CheckoutSection: React.FC<CheckoutSectionProps> = ({ onPixGenerated
   };
 
   return (
-    <section id="checkout" className="py-20 bg-[#07080B] relative border-t border-white/10">
+    <section id="checkout" className="py-16 sm:py-20 bg-[#07080B] relative border-t border-white/10">
       {/* Luz ambiente de destaque */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-red-600/10 blur-[150px] pointer-events-none rounded-full" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Cabeçalho */}
-        <div className="text-center max-w-2xl mx-auto mb-12">
+        <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-3">
             <Lock className="w-3.5 h-3.5" />
             <span>Checkout Oficial Seguro • Criptografia 256-Bit</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-black text-white uppercase font-display tracking-tight">
-            Garanta Seu Acesso <span className="text-emerald-400 font-mono">Por R$ 19,90</span>
+          <h2 className="text-2xl sm:text-4xl font-black text-white uppercase font-display tracking-tight">
+            Garanta Seu Acesso <span className="text-emerald-400 font-mono">Por {formattedAmount}</span>
           </h2>
-          <p className="mt-3 text-gray-400 text-sm sm:text-base">
+          <p className="mt-3 text-gray-400 text-xs sm:text-base">
             Preencha seus dados abaixo para gerar o Pix instantâneo e receber o convite exclusivo do grupo no Telegram.
           </p>
         </div>
@@ -119,7 +133,7 @@ export const CheckoutSection: React.FC<CheckoutSectionProps> = ({ onPixGenerated
               <div className="flex items-center justify-between pb-4 border-b border-white/10">
                 <span className="text-xs uppercase font-mono text-red-400 font-bold">Resumo do Pedido</span>
                 <span className="text-[11px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono font-bold">
-                  80% DE DESCONTO
+                  {badgeDiscount}
                 </span>
               </div>
 
@@ -154,12 +168,12 @@ export const CheckoutSection: React.FC<CheckoutSectionProps> = ({ onPixGenerated
 
                 <div className="pt-4 border-t border-white/10 flex items-baseline justify-between">
                   <div>
-                    <span className="block text-xs text-gray-400 line-through">De R$ 97,00</span>
+                    <span className="block text-xs text-gray-400 line-through">{originalPrice}</span>
                     <span className="text-sm font-bold text-gray-300">Total a pagar:</span>
                   </div>
                   <div className="text-right">
                     <span className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">
-                      R$ 19,90
+                      {formattedAmount}
                     </span>
                     <span className="block text-[10px] text-gray-400 uppercase font-mono">Pagamento único via Pix</span>
                   </div>
@@ -292,14 +306,14 @@ export const CheckoutSection: React.FC<CheckoutSectionProps> = ({ onPixGenerated
                       <span className="text-[10px] text-emerald-300">Processamento oficial instantâneo e seguro</span>
                     </div>
                   </div>
-                  <span className="text-xs font-mono font-bold text-emerald-400">R$ 19,90</span>
+                  <span className="text-xs font-mono font-bold text-emerald-400">{formattedAmount}</span>
                 </div>
 
                 {/* Botão de Envio */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-600 hover:from-emerald-400 hover:to-green-400 text-black font-black text-base uppercase tracking-wider shadow-[0_0_30px_rgba(16,185,129,0.5)] active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-600 hover:from-emerald-400 hover:to-green-400 text-black font-black text-sm sm:text-base uppercase tracking-wider shadow-[0_0_30px_rgba(16,185,129,0.5)] active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>
@@ -309,7 +323,7 @@ export const CheckoutSection: React.FC<CheckoutSectionProps> = ({ onPixGenerated
                   ) : (
                     <>
                       <Zap className="w-5 h-5 fill-black" />
-                      <span>Gerar Pix de R$ 19,90 & Liberar Telegram</span>
+                      <span>{ctaText || `Gerar Pix de ${formattedAmount} & Liberar Telegram`}</span>
                     </>
                   )}
                 </button>

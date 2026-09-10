@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Check, CheckCircle2, Loader2, X, Send, AlertTriangle, ExternalLink, RefreshCw } from 'lucide-react';
+import { Copy, Check, CheckCircle2, Loader2, X, Send, ExternalLink, RefreshCw } from 'lucide-react';
 import type { PixResponse } from '../types';
-import { checkPaymentStatus, simulatePaymentDev } from '../api/sigilopay';
+import { checkPaymentStatus } from '../api/sigilopay';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { trackPurchase } from '../lib/metaPixel';
 
@@ -10,6 +10,7 @@ interface PixPaymentModalProps {
   onClose: () => void;
   pixData: PixResponse;
   clientName: string;
+  amount?: number;
 }
 
 export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
@@ -17,7 +18,9 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
   onClose,
   pixData,
   clientName,
+  amount,
 }) => {
+  const currentAmount = amount || pixData.transaction?.amount || 19.90;
   const [status, setStatus] = useState<'PENDING' | 'PAID'>(
     pixData.transaction?.status === 'PAID' ? 'PAID' : 'PENDING'
   );
@@ -26,7 +29,6 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
     pixData.telegramLink || 'https://t.me/+ADCC2026_VIP_OFICIAL'
   );
   const [timeRemaining, setTimeRemaining] = useState<number>(15 * 60); // 15 minutos
-  const [isSimulating, setIsSimulating] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [checkFeedback, setCheckFeedback] = useState<string | null>(null);
 
@@ -37,9 +39,9 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
   useEffect(() => {
     if (status === 'PAID' && !purchaseTrackedRef.current) {
       purchaseTrackedRef.current = true;
-      trackPurchase(19.90, 'BRL', txId);
+      trackPurchase(currentAmount, 'BRL', txId);
     }
-  }, [status, txId]);
+  }, [status, txId, currentAmount]);
 
   const handleManualCheck = async () => {
     setIsChecking(true);
@@ -78,7 +80,7 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
     return () => clearInterval(timer);
   }, [isOpen, status]);
 
-  // Escuta em tempo real no Supabase (se configurado)
+  // Escuta em tempo real no Supabase
   useEffect(() => {
     if (!isOpen || status === 'PAID' || !txId) return;
 
@@ -141,23 +143,6 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
     }
   };
 
-  const handleSimulateApproval = async () => {
-    try {
-      setIsSimulating(true);
-      const res = await simulatePaymentDev(txId);
-      if (res.status === 'PAID') {
-        setStatus('PAID');
-        if (res.telegramLink) {
-          setTelegramUrl(res.telegramLink);
-        }
-      }
-    } catch (e) {
-      console.error('Erro na simulação:', e);
-    } finally {
-      setIsSimulating(false);
-    }
-  };
-
   const minutes = Math.floor(timeRemaining / 60);
   const seconds = timeRemaining % 60;
   const qrCodeUrl =
@@ -165,6 +150,8 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
     `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(
       pixData.pix?.code || ''
     )}`;
+
+  const formattedPrice = `R$ ${currentAmount.toFixed(2).replace('.', ',')}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 overflow-y-auto">
@@ -191,7 +178,7 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
             </div>
 
             <h3 className="text-xl sm:text-2xl font-black text-white uppercase font-display">
-              Pague <span className="text-emerald-400 font-mono">R$ 19,90</span> para Liberar
+              Pague <span className="text-emerald-400 font-mono">{formattedPrice}</span> para Liberar
             </h3>
             
             <p className="text-xs text-gray-400 mt-1 max-w-sm">
@@ -282,32 +269,6 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
               )}
             </div>
 
-            {/* Botão de Ajuda / Teste caso esteja em modo dev */}
-            {pixData.isTestMode && (
-              <div className="mt-5 w-full p-3.5 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-left">
-                <div className="flex items-center gap-2 text-amber-400 text-xs font-bold mb-1">
-                  <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                  <span>Modo Demonstração Ativo</span>
-                </div>
-                <p className="text-[11px] text-amber-200/80 leading-relaxed mb-3">
-                  Você pode testar a experiência de aprovação agora mesmo clicando no botão abaixo:
-                </p>
-                <button
-                  type="button"
-                  onClick={handleSimulateApproval}
-                  disabled={isSimulating}
-                  className="w-full py-2 px-3 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 rounded-xl text-amber-300 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
-                >
-                  {isSimulating ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <RefreshCw className="w-3.5 h-3.5" />
-                  )}
-                  <span>Simular Pagamento Aprovado Instantaneamente</span>
-                </button>
-              </div>
-            )}
-
           </div>
         )}
 
@@ -331,7 +292,7 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
             </h3>
 
             <p className="mt-2 text-sm text-gray-300 max-w-sm">
-              Parabéns, <strong className="text-white">{clientName || 'Campeão'}</strong>! Seu pagamento de <span className="text-emerald-400 font-bold font-mono">R$ 19,90</span> foi confirmado.
+              Parabéns, <strong className="text-white">{clientName || 'Campeão'}</strong>! Seu pagamento de <span className="text-emerald-400 font-bold font-mono">{formattedPrice}</span> foi confirmado.
             </p>
 
             {/* Card com Link do Telegram */}
@@ -367,6 +328,10 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
                 <span className="text-gray-300">ADCC 2026 VIP Pass</span>
               </div>
               <div className="flex justify-between">
+                <span>Valor Pago:</span>
+                <span className="text-emerald-400 font-bold">{formattedPrice}</span>
+              </div>
+              <div className="flex justify-between">
                 <span>Status:</span>
                 <span className="text-emerald-400 font-bold">APROVADO</span>
               </div>
@@ -374,7 +339,7 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
 
             <button
               onClick={onClose}
-              className="mt-6 text-xs text-gray-400 hover:text-white uppercase font-bold tracking-wider transition-colors"
+              className="mt-6 text-xs text-gray-400 hover:text-white uppercase font-bold tracking-wider transition-colors cursor-pointer"
             >
               Fechar Janela
             </button>

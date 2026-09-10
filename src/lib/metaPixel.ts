@@ -17,6 +17,10 @@ export const trackPixelEvent = (eventName: string, params?: Record<string, any>)
   }
 };
 
+export const trackPageView = (pageName?: string) => {
+  trackPixelEvent('PageView', pageName ? { page_name: pageName } : undefined);
+};
+
 export const trackInitiateCheckout = (value = 19.90, currency = 'BRL') => {
   trackPixelEvent('InitiateCheckout', {
     content_name: 'Passaporte VIP ADCC 2026',
