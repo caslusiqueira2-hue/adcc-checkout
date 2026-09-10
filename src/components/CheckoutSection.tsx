@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Lock, Zap, CheckCircle2, User, Mail, Phone, CreditCard, Loader2 } from 'lucide-react';
 import { generatePix } from '../api/sigilopay';
+import { trackInitiateCheckout } from '../lib/metaPixel';
 import type { PixResponse } from '../types';
 
 interface CheckoutSectionProps {
@@ -80,6 +81,7 @@ export const CheckoutSection: React.FC<CheckoutSectionProps> = ({ onPixGenerated
         },
       });
 
+      trackInitiateCheckout(19.90, 'BRL');
       onPixGenerated(response, name.trim());
     } catch (err: any) {
       setError(err.message || 'Falha ao processar solicitação de Pix. Verifique os dados e tente novamente.');

@@ -3,6 +3,7 @@ import { Copy, Check, CheckCircle2, Loader2, X, Send, AlertTriangle, ExternalLin
 import type { PixResponse } from '../types';
 import { checkPaymentStatus, simulatePaymentDev } from '../api/sigilopay';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { trackPurchase } from '../lib/metaPixel';
 
 interface PixPaymentModalProps {
   isOpen: boolean;
@@ -30,6 +31,15 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
   const [checkFeedback, setCheckFeedback] = useState<string | null>(null);
 
   const txId = pixData.transaction?.id || pixData.transaction?.sigilopay_id || '';
+  const purchaseTrackedRef = React.useRef(false);
+
+  // Disparar evento de Purchase do Meta Pixel ao confirmar pagamento
+  useEffect(() => {
+    if (status === 'PAID' && !purchaseTrackedRef.current) {
+      purchaseTrackedRef.current = true;
+      trackPurchase(19.90, 'BRL', txId);
+    }
+  }, [status, txId]);
 
   const handleManualCheck = async () => {
     setIsChecking(true);
