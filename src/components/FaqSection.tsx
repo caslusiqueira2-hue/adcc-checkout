@@ -18,8 +18,8 @@ export const FaqSection: React.FC = () => {
       a: 'Você terá acesso aos links de transmissão em alta definição (Full HD) sem anúncios e sem quedas de todos os tatames da TAURON Arena em Cracóvia, além de tabelas/brackets atualizadas em tempo real, alertas de entrada dos principais atletas no tatame e vídeos de finalizações.',
     },
     {
-      q: 'O pagamento via SigiloPay é seguro?',
-      a: 'Totalmente seguro. A SigiloPay é uma das principais instituições de pagamento do mercado, regulamentada pelo Banco Central do Brasil, utilizando criptografia SSL de 256 bits para processar seu Pix diretamente com seu banco.',
+      q: 'O pagamento via Pix é seguro?',
+      a: 'Totalmente seguro. Nosso gateway opera sob os protocolos oficiais do Banco Central do Brasil, utilizando criptografia SSL de 256 bits para processar seu Pix diretamente com sua instituição bancária de forma instantânea e protegida.',
     },
     {
       q: 'E se eu fechar a página por engano depois de pagar?',

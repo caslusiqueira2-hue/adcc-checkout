@@ -132,7 +132,7 @@ export const Hero: React.FC<HeroProps> = ({ onCtaClick }) => {
               </div>
               <div className="flex items-center gap-1.5">
                 <Shield className="w-4 h-4 text-yellow-400" />
-                <span>Transação 100% Segura SigiloPay</span>
+                <span>Transação 100% Segura & Criptografada</span>
               </div>
             </div>
 

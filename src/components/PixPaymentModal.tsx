@@ -192,7 +192,7 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
             <div className="mt-5 p-4 bg-white rounded-2xl shadow-2xl relative group">
               <img
                 src={qrCodeUrl}
-                alt="QR Code Pix SigiloPay"
+                alt="QR Code Pix Oficial"
                 className="w-48 h-48 sm:w-56 sm:h-56 object-contain"
               />
             </div>
@@ -272,12 +272,12 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
               )}
             </div>
 
-            {/* Botão de Ajuda / Teste caso esteja em modo dev ou sem as chaves da SigiloPay */}
+            {/* Botão de Ajuda / Teste caso esteja em modo dev */}
             {pixData.isTestMode && (
               <div className="mt-5 w-full p-3.5 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-left">
                 <div className="flex items-center gap-2 text-amber-400 text-xs font-bold mb-1">
                   <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                  <span>Modo Demonstração (Chaves SigiloPay aguardadas no .env)</span>
+                  <span>Modo Demonstração Ativo</span>
                 </div>
                 <p className="text-[11px] text-amber-200/80 leading-relaxed mb-3">
                   Você pode testar a experiência de aprovação agora mesmo clicando no botão abaixo:

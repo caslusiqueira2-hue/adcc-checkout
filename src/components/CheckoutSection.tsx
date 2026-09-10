@@ -99,7 +99,7 @@ export const CheckoutSection: React.FC<CheckoutSectionProps> = ({ onPixGenerated
         <div className="text-center max-w-2xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-3">
             <Lock className="w-3.5 h-3.5" />
-            <span>Checkout Seguro SigiloPay • Criptografia 256-Bit</span>
+            <span>Checkout Oficial Seguro • Criptografia 256-Bit</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-black text-white uppercase font-display tracking-tight">
             Garanta Seu Acesso <span className="text-emerald-400 font-mono">Por R$ 19,90</span>
@@ -287,7 +287,7 @@ export const CheckoutSection: React.FC<CheckoutSectionProps> = ({ onPixGenerated
                     </div>
                     <div>
                       <span className="text-xs font-bold text-white uppercase block">Pagamento Instantâneo via Pix</span>
-                      <span className="text-[10px] text-emerald-300">Processamento oficial via gateway SigiloPay</span>
+                      <span className="text-[10px] text-emerald-300">Processamento oficial instantâneo e seguro</span>
                     </div>
                   </div>
                   <span className="text-xs font-mono font-bold text-emerald-400">R$ 19,90</span>

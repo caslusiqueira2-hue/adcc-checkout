@@ -44,7 +44,7 @@ export const App: React.FC = () => {
         {/* 3. Benefícios do Grupo VIP no Telegram */}
         <VipBenefits onCtaClick={scrollToCheckout} />
 
-        {/* 4. Checkout Integrado via SigiloPay */}
+        {/* 4. Checkout Oficial Integrado */}
         <CheckoutSection onPixGenerated={handlePixGenerated} />
 
         {/* 5. Perguntas Frequentes (FAQ) */}

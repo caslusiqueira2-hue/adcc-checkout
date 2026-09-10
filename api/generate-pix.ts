@@ -96,12 +96,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (!sigilopayRes.ok) {
         const errorData: any = await sigilopayRes.json().catch(() => ({}));
-        let msg = errorData.message || errorData.details?.error || 'Erro ao gerar PIX na SigiloPay';
+        let msg = errorData.message || errorData.details?.error || 'Erro ao processar cobrança Pix. Tente novamente.';
         if (
           errorData.details?.error?.includes('Produtor não está ativo') ||
           errorData.message?.includes('not authorized to sell')
         ) {
-          msg = 'Conta SigiloPay: Produtor não está ativo. Ative o cadastro no painel app.sigilopay.com.br.';
+          msg = 'Gateway de pagamento: Conta do vendedor aguardando ativação.';
         }
         throw new Error(msg);
       }
@@ -131,7 +131,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       pixData = {
         transactionId,
         isTestMode: true,
-        message: 'Modo teste ativo (adicione as chaves da SigiloPay no arquivo .env para processar Pix real).',
+        message: 'Modo teste ativo (adicione as chaves no arquivo .env para processar Pix real).',
         pix: {
           code: simulatedPixCode,
           image: simulatedQrUrl,

@@ -16,8 +16,8 @@ export const Footer: React.FC = () => {
 
           <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.02]">
             <Shield className="w-5 h-5 text-blue-400" />
-            <span className="font-bold text-white text-xs">SigiloPay Gateway</span>
-            <span className="text-[11px] text-gray-400">Processamento oficial de pagamentos</span>
+            <span className="font-bold text-white text-xs">Gateway Seguro</span>
+            <span className="text-[11px] text-gray-400">Processamento oficial e protegido</span>
           </div>
 
           <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.02]">
