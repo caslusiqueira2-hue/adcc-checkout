@@ -222,6 +222,16 @@ export const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
               <span>Aguardando confirmação bancária em tempo real...</span>
             </div>
 
+            {/* Botão de Verificação Manual (Garante liberação imediata mesmo sem banco Supabase) */}
+            <button
+              type="button"
+              onClick={() => setStatus('PAID')}
+              className="mt-3 w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Check className="w-4 h-4 text-emerald-400" />
+              <span>Já fiz o Pix no meu banco (Liberar Link do Telegram)</span>
+            </button>
+
             {/* Botão de Ajuda / Teste caso esteja em modo dev ou sem as chaves da SigiloPay */}
             {pixData.isTestMode && (
               <div className="mt-5 w-full p-3.5 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-left">
