@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  body {
+    @apply bg-[#08090C] text-gray-100 antialiased selection:bg-red-600 selection:text-white;
+  }
+}
+
+.font-display {
+  font-family: 'Montserrat', 'Oswald', sans-serif;
+}
+
+/* Carbon & Tatami Texture Effects */
+.bg-grid-pattern {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.gradient-card {
+  background: linear-gradient(145deg, rgba(26, 27, 36, 0.85) 0%, rgba(15, 16, 22, 0.95) 100%);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gradient-card-red {
+  background: linear-gradient(145deg, rgba(40, 15, 22, 0.75) 0%, rgba(15, 16, 22, 0.95) 100%);
+  border: 1px solid rgba(225, 29, 72, 0.3);
+}
+
+.gradient-card-gold {
+  background: linear-gradient(145deg, rgba(45, 33, 15, 0.75) 0%, rgba(15, 16, 22, 0.95) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* Glow effects */
+.glow-red {
+  box-shadow: 0 0 35px -5px rgba(225, 29, 72, 0.5);
+}
+
+.glow-gold {
+  box-shadow: 0 0 35px -5px rgba(245, 158, 11, 0.45);
+}
+
+.glow-green {
+  box-shadow: 0 0 35px -5px rgba(16, 185, 129, 0.5);
+}
+
+/* Pulsing animated badge */
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2.5s infinite ease-in-out;
+}
